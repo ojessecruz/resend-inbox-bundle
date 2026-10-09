@@ -30,6 +30,7 @@
         <div class="inbox-list__toolbar">
             <input class="inbox-checkbox" type="checkbox" data-inbox-select-page aria-label="{{ 'actions.select_page'|trans({}, 'resend_inbox') }}">
             <div class="inbox-list__bulk" data-inbox-bulk>
+                <button class="inbox-button inbox-button--small" type="submit" name="action" value="mark_read">{{ 'actions.mark_read'|trans({}, 'resend_inbox') }}</button>
                 {% if filters.status == 'archived' %}
                     <button class="inbox-button inbox-button--small" type="submit" name="action" value="unarchive">{{ 'actions.unarchive'|trans({}, 'resend_inbox') }}</button>
                 {% else %}

@@ -164,6 +164,8 @@ The look comes from `inbox.css`, driven by CSS variables. Override them to match
 }
 ```
 
+The email body takes `--inbox-email-text` and `--inbox-email-bg` (dark text on white by default, also in dark mode, since most HTML emails are designed for a light background).
+
 It follows the system's dark mode. `inbox.js` only adds conveniences (select all, autosizing the email iframe, applying the status filter on change); every screen works without it.
 
 ## Customizing the screens

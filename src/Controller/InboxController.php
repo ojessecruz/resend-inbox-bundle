@@ -152,7 +152,7 @@ final class InboxController extends AbstractController
     }
 
     /**
-     * Archive or unarchive the ticked conversations of the list.
+     * Mark as read, archive or unarchive the ticked conversations of the list.
      */
     public function bulk(Request $request): Response
     {
@@ -167,20 +167,29 @@ final class InboxController extends AbstractController
                 $ids[] = (int) $id;
             }
         }
+        $notice = match ($action) {
+            'mark_read' => 'notices.marked_read',
+            'archive' => 'notices.archived',
+            'unarchive' => 'notices.unarchived',
+            default => null,
+        };
         $count = 0;
 
-        if ($ids !== [] && in_array($action, ['archive', 'unarchive'], true)) {
+        if ($ids !== [] && $notice !== null) {
             foreach ($this->threads->findBy(['id' => $ids]) as $thread) {
-                $action === 'archive' ? $thread->archive() : $thread->unarchive();
+                match ($action) {
+                    'mark_read' => $thread->markRead(),
+                    'archive' => $thread->archive(),
+                    default => $thread->unarchive(),
+                };
                 $count++;
             }
 
             $this->entityManager->flush();
         }
 
-        if ($count > 0) {
-            $key = $action === 'archive' ? 'notices.archived' : 'notices.unarchived';
-            $this->addFlash(self::FLASH, $this->translator->trans($key, ['%count%' => $count], 'resend_inbox'));
+        if ($notice !== null && $count > 0) {
+            $this->addFlash(self::FLASH, $this->translator->trans($notice, ['%count%' => $count], 'resend_inbox'));
         }
 
         return $this->redirectToRoute('resend_inbox_index', $this->filterQuery($this->filters($request, $request->request->all('filters'))));

@@ -6,9 +6,16 @@
     const ready = (callback) => (document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', callback) : callback());
 
     ready(() => {
-        // Grow each email iframe to its content (allow-same-origin, no scripts inside).
+        // Paint each email with its iframe's colors and grow it to its content (allow-same-origin, no scripts inside).
         document.querySelectorAll('iframe[data-inbox-autosize]').forEach((frame) => {
             const resize = () => {
+                const body = frame.contentDocument?.body;
+
+                if (body) {
+                    body.style.color = getComputedStyle(frame).color;
+                    body.style.background = getComputedStyle(frame).backgroundColor;
+                }
+
                 const height = frame.contentDocument?.documentElement?.scrollHeight;
 
                 if (height) {

@@ -30,6 +30,7 @@ return [
         'send_reply' => 'Send reply',
         'archive' => 'Archive',
         'unarchive' => 'Move to inbox',
+        'mark_read' => 'Mark as read',
         'mark_unread' => 'Mark as unread',
         'load_images' => 'Load images',
         'filter' => 'Filter',
@@ -37,6 +38,7 @@ return [
         'select_page' => 'Select every conversation on this page',
     ],
     'notices' => [
+        'marked_read' => '%count% conversation marked as read.|%count% conversations marked as read.',
         'archived' => '%count% conversation archived.|%count% conversations archived.',
         'unarchived' => '%count% conversation moved to the inbox.|%count% conversations moved to the inbox.',
         'reply_sent' => 'Reply sent.',

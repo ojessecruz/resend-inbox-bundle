@@ -21,6 +21,8 @@
     --inbox-danger: #fee2e2;
     --inbox-danger-text: #991b1b;
     --inbox-radius: 12px;
+    --inbox-email-text: #18181b;
+    --inbox-email-bg: #ffffff;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -454,7 +456,8 @@ textarea.inbox-input {
     height: 400px;
     border: 0;
     border-radius: 8px;
-    background: #ffffff;
+    color: var(--inbox-email-text);
+    background: var(--inbox-email-bg);
 }
 
 /* Forms */

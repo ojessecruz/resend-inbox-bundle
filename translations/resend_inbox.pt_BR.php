@@ -30,6 +30,7 @@ return [
         'send_reply' => 'Enviar resposta',
         'archive' => 'Arquivar',
         'unarchive' => 'Mover para a caixa de entrada',
+        'mark_read' => 'Marcar como lida',
         'mark_unread' => 'Marcar como não lida',
         'load_images' => 'Carregar imagens',
         'filter' => 'Filtrar',
@@ -37,6 +38,7 @@ return [
         'select_page' => 'Selecionar todas as conversas desta página',
     ],
     'notices' => [
+        'marked_read' => '%count% conversa marcada como lida.|%count% conversas marcadas como lidas.',
         'archived' => '%count% conversa arquivada.|%count% conversas arquivadas.',
         'unarchived' => '%count% conversa movida para a caixa de entrada.|%count% conversas movidas para a caixa de entrada.',
         'reply_sent' => 'Resposta enviada.',
