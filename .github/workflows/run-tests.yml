@@ -49,9 +49,12 @@ jobs:
 
       - name: Install dependencies
         run: |
-          composer require "symfony/asset:${{ matrix.symfony }}" "symfony/form:${{ matrix.symfony }}" "symfony/framework-bundle:${{ matrix.symfony }}" "symfony/messenger:${{ matrix.symfony }}" "symfony/security-bundle:${{ matrix.symfony }}" "symfony/security-csrf:${{ matrix.symfony }}" "symfony/translation:${{ matrix.symfony }}" "symfony/twig-bundle:${{ matrix.symfony }}" "symfony/validator:${{ matrix.symfony }}" --no-interaction --no-update
-          composer require --dev "symfony/browser-kit:${{ matrix.symfony }}" "symfony/css-selector:${{ matrix.symfony }}" "symfony/dom-crawler:${{ matrix.symfony }}" --no-interaction --no-update
+          composer global config --no-plugins allow-plugins.symfony/flex true
+          composer global require --no-interaction --no-progress symfony/flex
           composer update --${{ matrix.stability }} --prefer-dist --no-interaction -W
+        env:
+          # symfony/flex keeps every symfony/* package on the matrix version.
+          SYMFONY_REQUIRE: ${{ matrix.symfony }}
 
       - name: Analyse
         if: matrix.stability == 'prefer-stable'

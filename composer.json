@@ -15,7 +15,7 @@
     "require": {
         "php": "^8.3",
         "doctrine/doctrine-bundle": "^2.13||^3.0",
-        "doctrine/orm": "^3.3",
+        "doctrine/orm": "^3.4",
         "ojessecruz/resend-inbox": "^0.1",
         "psr/log": "^3.0",
         "symfony/asset": "^7.4||^8.0",

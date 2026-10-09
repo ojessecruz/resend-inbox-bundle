@@ -16,7 +16,7 @@ The decisions (threading, replies, auto-reply detection, webhook parsing) live i
 
 - PHP 8.3+ (8.4+ for Symfony 8)
 - Symfony 7.4 or 8
-- Doctrine ORM 3 (SQLite, MySQL or PostgreSQL)
+- Doctrine ORM 3.4+ (SQLite, MySQL or PostgreSQL)
 - A Resend account with receiving enabled on your domain, and an API key with full access
 
 ## Installation
