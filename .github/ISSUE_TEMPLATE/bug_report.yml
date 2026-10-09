@@ -1,0 +1,31 @@
+name: Bug report
+description: Something doesn't work as documented.
+labels: [bug]
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What you did, what you expected and what happened instead.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: How to reproduce
+      description: The smallest code or steps that reproduce the problem.
+    validations:
+      required: true
+  - type: textarea
+    id: versions
+    attributes:
+      label: Versions
+      value: |
+        - PHP version:
+        - Symfony version:
+        - Doctrine ORM version:
+        - Database (MySQL, PostgreSQL, SQLite…):
+        - `ojessecruz/resend-inbox-bundle` version:
+        - `ojessecruz/resend-inbox` version:
+    validations:
+      required: true

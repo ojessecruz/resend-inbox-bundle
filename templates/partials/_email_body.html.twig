@@ -1,0 +1,18 @@
+{#
+    An email's HTML in a sandboxed iframe: no scripts, links open in a new
+    tab, and a CSP blocks remote resources (tracking pixels) until images
+    are allowed. allow-same-origin without allow-scripts only lets inbox.js
+    measure the height. Vars: html, allow_images, id.
+#}
+{% set csp = allow_images
+    ? "default-src 'none'; img-src https: http: data:; style-src 'unsafe-inline' https:; font-src https: data:"
+    : "default-src 'none'; img-src data:; style-src 'unsafe-inline'" %}
+{% set document = '<!doctype html><html><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="' ~ csp ~ '"><base target="_blank"><style>html,body{margin:0}body{padding:4px;font:14px/1.5 system-ui,sans-serif;color:#18181b;background:#fff;overflow-wrap:anywhere}img{max-width:100%;height:auto}</style></head><body>' ~ html ~ '</body></html>' %}
+<iframe
+    id="message-{{ id }}"
+    class="inbox-email-body"
+    sandbox="allow-same-origin allow-popups allow-popups-to-escape-sandbox"
+    srcdoc="{{ document }}"
+    title="{{ 'message.body'|trans({}, 'resend_inbox') }}"
+    data-inbox-autosize
+></iframe>

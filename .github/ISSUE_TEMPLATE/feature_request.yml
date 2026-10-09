@@ -1,0 +1,24 @@
+name: Feature request
+description: Propose a change. Wait for agreement here before opening a pull request.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: The problem
+      description: What can't you do today? Describe the use case, not only the solution.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed change
+    validations:
+      required: true
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: Scope
+      options:
+        - label: I read the "Scope of this package" section of CONTRIBUTING.md and this change fits it.
+          required: true

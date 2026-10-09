@@ -1,0 +1,120 @@
+name: run-tests
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '**.php'
+      - '**.twig'
+      - '.github/workflows/run-tests.yml'
+      - 'phpunit.xml.dist'
+      - 'phpstan.neon.dist'
+      - 'composer.json'
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        php: [8.5, 8.4, 8.3]
+        symfony: [8.*, 7.4.*]
+        stability: [prefer-lowest, prefer-stable]
+        exclude:
+          # Symfony 8 requires PHP 8.4.
+          - php: 8.3
+            symfony: 8.*
+
+    name: P${{ matrix.php }} - S${{ matrix.symfony }} - ${{ matrix.stability }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: dom, curl, libxml, mbstring, zip, pdo, sqlite, pdo_sqlite
+          coverage: none
+
+      - name: Install dependencies
+        run: |
+          composer require "symfony/asset:${{ matrix.symfony }}" "symfony/form:${{ matrix.symfony }}" "symfony/framework-bundle:${{ matrix.symfony }}" "symfony/messenger:${{ matrix.symfony }}" "symfony/security-bundle:${{ matrix.symfony }}" "symfony/security-csrf:${{ matrix.symfony }}" "symfony/translation:${{ matrix.symfony }}" "symfony/twig-bundle:${{ matrix.symfony }}" "symfony/validator:${{ matrix.symfony }}" --no-interaction --no-update
+          composer require --dev "symfony/browser-kit:${{ matrix.symfony }}" "symfony/css-selector:${{ matrix.symfony }}" "symfony/dom-crawler:${{ matrix.symfony }}" --no-interaction --no-update
+          composer update --${{ matrix.stability }} --prefer-dist --no-interaction -W
+
+      - name: Analyse
+        if: matrix.stability == 'prefer-stable'
+        run: vendor/bin/phpstan analyse --no-progress --memory-limit=1G
+
+      - name: Execute tests
+        run: vendor/bin/pest --ci
+
+  database:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - database: mysql
+            url: mysql://root:root@127.0.0.1:3306/inbox?serverVersion=8.4&charset=utf8mb4
+          - database: postgres
+            url: postgresql://postgres:root@127.0.0.1:5432/inbox?serverVersion=17&charset=utf8
+
+    name: ${{ matrix.database }}
+
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: inbox
+        ports: ['3306:3306']
+        options: --health-cmd="mysqladmin ping -proot" --health-interval=5s --health-timeout=5s --health-retries=20
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: root
+          POSTGRES_DB: inbox
+        ports: ['5432:5432']
+        options: --health-cmd="pg_isready -U postgres" --health-interval=5s --health-timeout=5s --health-retries=20
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.4
+          extensions: dom, curl, libxml, mbstring, zip, pdo, pdo_mysql, pdo_pgsql
+          coverage: none
+
+      - name: Install dependencies
+        run: composer update --prefer-stable --prefer-dist --no-interaction
+
+      - name: Execute tests
+        run: vendor/bin/pest --ci
+        env:
+          DATABASE_URL: ${{ matrix.url }}
+
+  tests-passed:
+    if: always()
+    needs: [test, database]
+    runs-on: ubuntu-latest
+    name: Tests passed
+
+    steps:
+      - name: Every job passed
+        run: test "${{ needs.test.result }}" = success && test "${{ needs.database.result }}" = success

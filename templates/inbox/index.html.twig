@@ -1,0 +1,54 @@
+{% extends '@ResendInbox/layout.html.twig' %}
+
+{% block resend_inbox_content %}
+<div class="inbox">
+    {% embed '@ResendInbox/partials/_heading.html.twig' with {title: 'titles.inbox'|trans({}, 'resend_inbox')} %}
+        {% block actions %}
+            <a class="inbox-button inbox-button--primary" href="{{ path('resend_inbox_compose') }}">{{ 'actions.compose'|trans({}, 'resend_inbox') }}</a>
+        {% endblock %}
+    {% endembed %}
+
+    {{ include('@ResendInbox/partials/_flashes.html.twig') }}
+
+    {{ include('@ResendInbox/partials/_tabs.html.twig', {tabs: tabs, current: filters.tab, counts: unread_by_tab, filters: filters}) }}
+
+    <form class="inbox-filters" method="get" action="{{ path('resend_inbox_index') }}">
+        {% if filters.tab != '' %}<input type="hidden" name="tab" value="{{ filters.tab }}">{% endif %}
+        <input class="inbox-input" type="search" name="search" value="{{ filters.search }}" placeholder="{{ 'list.search'|trans({}, 'resend_inbox') }}" aria-label="{{ 'list.search'|trans({}, 'resend_inbox') }}">
+        <select class="inbox-input inbox-input--narrow" name="status" aria-label="{{ 'list.status'|trans({}, 'resend_inbox') }}" data-inbox-autosubmit>
+            {% for status in statuses %}
+                <option value="{{ status }}"{% if status == filters.status %} selected{% endif %}>{{ ('status.' ~ status)|trans({}, 'resend_inbox') }}</option>
+            {% endfor %}
+        </select>
+        <button class="inbox-button" type="submit">{{ 'actions.filter'|trans({}, 'resend_inbox') }}</button>
+    </form>
+
+    <form class="inbox-list" method="post" action="{{ path('resend_inbox_bulk') }}" data-inbox-selection>
+        <input type="hidden" name="_token" value="{{ csrf_token('resend_inbox_bulk') }}">
+        {% for key, value in filters %}<input type="hidden" name="filters[{{ key }}]" value="{{ value }}">{% endfor %}
+
+        <div class="inbox-list__toolbar">
+            <input class="inbox-checkbox" type="checkbox" data-inbox-select-page aria-label="{{ 'actions.select_page'|trans({}, 'resend_inbox') }}">
+            <div class="inbox-list__bulk" data-inbox-bulk>
+                {% if filters.status == 'archived' %}
+                    <button class="inbox-button inbox-button--small" type="submit" name="action" value="unarchive">{{ 'actions.unarchive'|trans({}, 'resend_inbox') }}</button>
+                {% else %}
+                    <button class="inbox-button inbox-button--small" type="submit" name="action" value="archive">{{ 'actions.archive'|trans({}, 'resend_inbox') }}</button>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if threads is empty %}
+            <p class="inbox-list__empty">{{ 'list.empty'|trans({}, 'resend_inbox') }}</p>
+        {% else %}
+            <ul class="inbox-list__rows">
+                {% for thread in threads %}
+                    {{ include('@ResendInbox/partials/_thread_row.html.twig', {thread: thread, latest: latest[thread.id] ?? null, message_count: message_counts[thread.id] ?? 0}) }}
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </form>
+
+    {{ include('@ResendInbox/partials/_pagination.html.twig', {page: page, pages: pages, query: filters}) }}
+</div>
+{% endblock %}

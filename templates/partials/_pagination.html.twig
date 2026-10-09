@@ -1,0 +1,9 @@
+{# Previous / next. Vars: page, pages, query (current filters). #}
+{% if pages > 1 %}
+    {% set query = query|filter(v => v != '') %}
+    <nav class="inbox-pagination" aria-label="{{ 'pagination.label'|trans({}, 'resend_inbox') }}">
+        {% if page > 1 %}<a class="inbox-button" href="{{ path('resend_inbox_index', query|merge({page: page - 1})) }}" rel="prev">{{ 'pagination.previous'|trans({}, 'resend_inbox') }}</a>{% endif %}
+        <span class="inbox-muted">{{ 'pagination.page'|trans({'%page%': page, '%pages%': pages}, 'resend_inbox') }}</span>
+        {% if page < pages %}<a class="inbox-button" href="{{ path('resend_inbox_index', query|merge({page: page + 1})) }}" rel="next">{{ 'pagination.next'|trans({}, 'resend_inbox') }}</a>{% endif %}
+    </nav>
+{% endif %}

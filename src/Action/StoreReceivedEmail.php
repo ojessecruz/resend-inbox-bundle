@@ -1,0 +1,133 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Jessecruz\ResendInboxBundle\Action;
+
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
+use Jessecruz\ResendInbox\Direction;
+use Jessecruz\ResendInbox\EmailAddress;
+use Jessecruz\ResendInbox\Exceptions\MailboxException;
+use Jessecruz\ResendInbox\ResendMailbox;
+use Jessecruz\ResendInbox\Threading\ThreadResolver;
+use Jessecruz\ResendInboxBundle\Entity\InboxMessage;
+use Jessecruz\ResendInboxBundle\Entity\InboxThread;
+use Jessecruz\ResendInboxBundle\Event\InboxEmailReceived;
+use Jessecruz\ResendInboxBundle\Repository\InboxMessageRepository;
+use Jessecruz\ResendInboxBundle\Settings\InboxSettings;
+use Psr\EventDispatcher\EventDispatcherInterface;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
+
+final readonly class StoreReceivedEmail
+{
+    public function __construct(
+        private ResendMailbox $resend,
+        private ThreadResolver $threads,
+        private InboxSettings $settings,
+        private ManagerRegistry $registry,
+        private EntityManagerInterface $entityManager,
+        private InboxMessageRepository $messages,
+        private EventDispatcherInterface $events,
+        private LoggerInterface $logger = new NullLogger,
+    ) {}
+
+    /**
+     * Fetch the full inbound email from Resend, file it into its
+     * conversation (reopening it as unread) and dispatch InboxEmailReceived
+     * unless it is machine-generated. Idempotent per Resend email id, so
+     * webhook redeliveries store and notify once. Mail addressed to another
+     * domain on the same Resend account is dropped and returns null.
+     *
+     * @throws MailboxException
+     */
+    public function handle(string $resendId): ?InboxMessage
+    {
+        $existing = $this->messages->findByResendId($resendId);
+
+        if ($existing !== null) {
+            return $existing;
+        }
+
+        $received = $this->resend->receivedEmail($resendId);
+        $mailbox = $this->settings->mailbox();
+        $recipients = $received->recipients();
+
+        if (! $mailbox->hasOwnRecipient($recipients)) {
+            $this->logger->info('Ignoring received email [{id}]: no recipient on {domain}.', [
+                'id' => $resendId,
+                'domain' => $mailbox->domain,
+                'recipients' => array_map(EmailAddress::address(...), $recipients),
+            ]);
+
+            return null;
+        }
+
+        $address = $mailbox->mailboxFor($recipients);
+
+        try {
+            $message = $this->entityManager->wrapInTransaction(function (EntityManagerInterface $entityManager) use ($received, $address): InboxMessage {
+                $threadId = $this->threads->resolveFor($received);
+                $thread = $threadId !== null ? $entityManager->find(InboxThread::class, $threadId) : null;
+
+                if ($thread === null) {
+                    $thread = new InboxThread($received->subject, $address, $received->receivedAt);
+                    $entityManager->persist($thread);
+                }
+
+                $inReplyTo = $received->inReplyTo();
+                $references = $received->references();
+
+                $message = new InboxMessage(
+                    thread: $thread,
+                    direction: Direction::Inbound,
+                    mailbox: $address,
+                    fromAddress: $received->fromAddress,
+                    to: $received->to,
+                    subject: $received->subject,
+                    sentAt: $received->receivedAt,
+                    resendId: $received->resendId,
+                    messageId: $received->messageId,
+                    inReplyTo: $inReplyTo[0] ?? null,
+                    references: $references !== [] ? implode(' ', $references) : null,
+                    fromName: $received->fromName,
+                    cc: $received->cc,
+                    replyTo: $received->replyTo,
+                    html: $received->html,
+                    text: $received->text,
+                    headers: $received->headers,
+                    attachments: $received->attachments,
+                );
+
+                $entityManager->persist($message);
+
+                $thread->fileUnder($address);
+                $thread->touch($received->receivedAt);
+                $thread->markUnread();
+                $thread->unarchive();
+
+                return $message;
+            });
+        } catch (UniqueConstraintViolationException) {
+            // A concurrent delivery of the same webhook stored it first; the
+            // failed flush closed the entity manager.
+            $this->registry->resetManager();
+
+            $stored = $this->messages->findByResendId($resendId);
+
+            if ($stored === null) {
+                throw new MailboxException("Received email [{$resendId}] could not be stored.");
+            }
+
+            return $stored;
+        }
+
+        if (! $received->isAutoGenerated()) {
+            $this->events->dispatch(new InboxEmailReceived($message));
+        }
+
+        return $message;
+    }
+}

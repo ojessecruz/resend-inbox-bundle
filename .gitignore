@@ -1,0 +1,11 @@
+composer.lock
+/vendor
+.phpunit.cache
+.phpunit.result.cache
+/build
+/.idea
+/.vscode
+phpunit.xml
+phpstan.neon
+/coverage
+CLAUDE.md

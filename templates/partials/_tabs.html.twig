@@ -1,0 +1,11 @@
+{# One tab per mailbox. Vars: tabs (key => label), current, counts (key => unread), filters. #}
+<nav class="inbox-tabs" aria-label="{{ 'tabs.label'|trans({}, 'resend_inbox') }}">
+    {% for key, label in tabs %}
+        {% set query = {tab: key ~ '', status: filters.status, search: filters.search}|filter(v => v != '') %}
+        {% if query.status is defined and query.status == 'inbox' %}{% set query = query|filter((v, k) => k != 'status') %}{% endif %}
+        <a class="inbox-tab{% if current == key ~ '' %} inbox-tab--current{% endif %}" href="{{ path('resend_inbox_index', query) }}"{% if current == key ~ '' %} aria-current="page"{% endif %}>
+            {{ label }}
+            {% if (counts[key] ?? 0) > 0 %}<span class="inbox-badge inbox-badge--info">{{ counts[key] }}</span>{% endif %}
+        </a>
+    {% endfor %}
+</nav>

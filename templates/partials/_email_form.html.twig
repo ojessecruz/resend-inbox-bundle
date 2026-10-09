@@ -1,0 +1,17 @@
+{# From / To / Subject / Message fields and the submit button. Vars: form, submit_label. #}
+{{ form_start(form, {attr: {class: 'inbox-form', novalidate: 'novalidate'}}) }}
+    {% for field in ['from', 'to', 'subject', 'body'] %}
+        {% set child = form[field] %}
+        <div class="inbox-field{% if not child.vars.valid %} inbox-field--invalid{% endif %}">
+            {{ form_label(child, null, {label_attr: {class: 'inbox-field__label'}}) }}
+            {{ form_widget(child, {attr: {class: 'inbox-input'}}) }}
+            {% for error in child.vars.errors %}<p class="inbox-field__error">{{ error.message }}</p>{% endfor %}
+            {% if child.vars.help %}<p class="inbox-field__help">{{ child.vars.help|trans({}, 'resend_inbox') }}</p>{% endif %}
+        </div>
+    {% endfor %}
+    {% for error in form.vars.errors %}<p class="inbox-field__error">{{ error.message }}</p>{% endfor %}
+    <div class="inbox-form__actions">
+        <button class="inbox-button inbox-button--primary" type="submit">{{ submit_label }}</button>
+    </div>
+{{ form_rest(form) }}
+{{ form_end(form, {render_rest: false}) }}

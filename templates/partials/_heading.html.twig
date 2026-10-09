@@ -1,0 +1,8 @@
+{# Page title with optional subtitle and an "actions" block. Vars: title, subtitle. #}
+<header class="inbox-heading">
+    <div class="inbox-heading__text">
+        <h1 class="inbox-heading__title">{{ title }}</h1>
+        {% if subtitle is defined and subtitle %}<p class="inbox-heading__subtitle">{{ subtitle }}</p>{% endif %}
+    </div>
+    <div class="inbox-heading__actions">{% block actions %}{% endblock %}</div>
+</header>

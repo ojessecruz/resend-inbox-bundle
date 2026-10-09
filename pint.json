@@ -1,0 +1,15 @@
+{
+    "preset": "laravel",
+    "notName": [
+        "TestCase.php",
+        "Kernel.php"
+    ],
+    "notPath": [
+        "src/Entity"
+    ],
+    "rules": {
+        "declare_strict_types": true,
+        "final_class": true,
+        "method_chaining_indentation": false
+    }
+}

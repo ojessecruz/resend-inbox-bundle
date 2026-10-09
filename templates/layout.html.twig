@@ -1,0 +1,21 @@
+{#
+    Wraps every inbox screen. The default is a standalone page. To use your
+    own layout, override this file in templates/bundles/ResendInboxBundle/
+    and keep the resend_inbox_content block, for example:
+
+        {% extends 'base.html.twig' %}
+        {% block stylesheets %}{{ parent() }}{{ include('@ResendInbox/_assets.html.twig') }}{% endblock %}
+        {% block body %}{% block resend_inbox_content %}{% endblock %}{% endblock %}
+#}
+<!doctype html>
+<html lang="{{ app.request.locale|default('en')|replace({'_': '-'}) }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block resend_inbox_title %}{{ 'titles.inbox'|trans({}, 'resend_inbox') }}{% endblock %}</title>
+    {{ include('@ResendInbox/_assets.html.twig') }}
+</head>
+<body class="inbox-page">
+    {% block resend_inbox_content %}{% endblock %}
+</body>
+</html>

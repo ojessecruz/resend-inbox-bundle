@@ -1,0 +1,5 @@
+{# Delivery badge of an email sent from the inbox. Vars: message. #}
+{% if message.deliveryStatus %}
+    {% set tone = {delivered: 'success', bounced: 'danger', complained: 'danger'}[message.deliveryStatus.value] ?? 'neutral' %}
+    <span class="inbox-badge inbox-badge--{{ tone }}"{% if message.bounceMessage %} title="{{ message.bounceMessage }}"{% endif %}>{{ ('delivery.' ~ message.deliveryStatus.value)|trans({}, 'resend_inbox') }}</span>
+{% endif %}

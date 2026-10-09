@@ -1,0 +1,4 @@
+{# Notices from the inbox actions. #}
+{% for notice in app.flashes('resend_inbox') %}
+    <p class="inbox-notice" role="status">{{ notice }}</p>
+{% endfor %}

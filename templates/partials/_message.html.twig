@@ -1,0 +1,40 @@
+{# One email of the conversation. Vars: message, allow_images, images_allowed (ids already allowed). #}
+<article class="inbox-card inbox-message{% if not message.inbound %} inbox-message--outbound{% endif %}">
+    <header class="inbox-message__header">
+        <div class="inbox-message__meta">
+            <p class="inbox-message__from">{{ message.fromLabel }}</p>
+            <p>{{ 'message.to'|trans({'%address%': message.to|join(', ')}, 'resend_inbox') }}</p>
+            {% if message.cc is not empty %}<p>{{ 'message.cc'|trans({'%address%': message.cc|join(', ')}, 'resend_inbox') }}</p>{% endif %}
+            {% if not message.inbound and message.sentBy %}<p>{{ 'message.sent_by'|trans({'%name%': message.sentBy}, 'resend_inbox') }}</p>{% endif %}
+        </div>
+        <div class="inbox-message__side">
+            {{ include('@ResendInbox/partials/_delivery_status.html.twig', {message: message}) }}
+            <time class="inbox-muted" datetime="{{ message.sentAt|date('c') }}">{{ message.sentAt|date('date_format'|trans({}, 'resend_inbox')) }}</time>
+        </div>
+    </header>
+
+    <div class="inbox-message__body">
+        {% if message.html %}
+            {% if message.hasRemoteImages and not allow_images %}
+                <p class="inbox-message__images">
+                    {{ 'message.images_blocked'|trans({}, 'resend_inbox') }}
+                    <a class="inbox-button inbox-button--small" href="{{ path('resend_inbox_thread', {id: message.thread.id, images: (images_allowed|merge([message.id]))|join(',')}) }}#message-{{ message.id }}">{{ 'actions.load_images'|trans({}, 'resend_inbox') }}</a>
+                </p>
+            {% endif %}
+            {{ include('@ResendInbox/partials/_email_body.html.twig', {html: message.html, allow_images: allow_images, id: message.id}) }}
+        {% else %}
+            <div class="inbox-message__text">{{ message.text }}</div>
+        {% endif %}
+    </div>
+
+    {% if message.attachments is not empty %}
+        <div class="inbox-message__attachments">
+            {% for attachment in message.attachments %}
+                <a class="inbox-button inbox-button--small" href="{{ path('resend_inbox_attachment', {id: message.id, attachment: attachment.id}) }}" target="_blank" rel="noopener">
+                    {{ attachment.filename ?? 'message.attachment'|trans({}, 'resend_inbox') }}
+                    {% if attachment.size ?? false %}<span class="inbox-muted">({{ attachment.size|resend_inbox_file_size }})</span>{% endif %}
+                </a>
+            {% endfor %}
+        </div>
+    {% endif %}
+</article>

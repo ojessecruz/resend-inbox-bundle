@@ -1,0 +1,40 @@
+{% extends '@ResendInbox/layout.html.twig' %}
+
+{% block resend_inbox_title %}{{ thread.subject ?: 'no_subject'|trans({}, 'resend_inbox') }}{% endblock %}
+
+{% block resend_inbox_content %}
+<div class="inbox inbox--thread">
+    <a class="inbox-back" href="{{ path('resend_inbox_index') }}">&larr; {{ 'titles.inbox'|trans({}, 'resend_inbox') }}</a>
+
+    {% embed '@ResendInbox/partials/_heading.html.twig' with {title: thread.subject ?: 'no_subject'|trans({}, 'resend_inbox'), subtitle: thread.mailbox} %}
+        {% block actions %}
+            {% set token = csrf_token('resend_inbox_thread_' ~ thread.id) %}
+            <form method="post" action="{{ path('resend_inbox_thread_action', {id: thread.id, action: 'mark_unread'}) }}">
+                <input type="hidden" name="_token" value="{{ token }}">
+                <button class="inbox-button" type="submit">{{ 'actions.mark_unread'|trans({}, 'resend_inbox') }}</button>
+            </form>
+            <form method="post" action="{{ path('resend_inbox_thread_action', {id: thread.id, action: thread.archived ? 'unarchive' : 'archive'}) }}">
+                <input type="hidden" name="_token" value="{{ token }}">
+                <button class="inbox-button" type="submit">{{ (thread.archived ? 'actions.unarchive' : 'actions.archive')|trans({}, 'resend_inbox') }}</button>
+            </form>
+        {% endblock %}
+    {% endembed %}
+
+    {% if thread.archived %}
+        <span class="inbox-badge">{{ 'status.archived'|trans({}, 'resend_inbox') }}</span>
+    {% endif %}
+
+    {{ include('@ResendInbox/partials/_flashes.html.twig') }}
+
+    <div class="inbox-messages">
+        {% for message in messages %}
+            {{ include('@ResendInbox/partials/_message.html.twig', {message: message, allow_images: message.id in images_allowed, images_allowed: images_allowed}) }}
+        {% endfor %}
+    </div>
+
+    <section class="inbox-card inbox-reply">
+        <h2 class="inbox-reply__title">{{ 'titles.reply'|trans({}, 'resend_inbox') }}</h2>
+        {{ include('@ResendInbox/partials/_email_form.html.twig', {form: form, submit_label: 'actions.send_reply'|trans({}, 'resend_inbox')}) }}
+    </section>
+</div>
+{% endblock %}

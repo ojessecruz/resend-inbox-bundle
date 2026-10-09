@@ -1,0 +1,15 @@
+{# One conversation in the list. Vars: thread, latest (its newest message or null), message_count. #}
+<li class="inbox-row{% if thread.unread %} inbox-row--unread{% endif %}">
+    <input class="inbox-checkbox" type="checkbox" name="ids[]" value="{{ thread.id }}" data-inbox-select aria-label="{{ 'actions.select'|trans({}, 'resend_inbox') }}">
+    <a class="inbox-row__link" href="{{ path('resend_inbox_thread', {id: thread.id}) }}">
+        <span class="inbox-row__top">
+            <span class="inbox-row__who">
+                {% if latest and latest.inbound %}{{ latest.fromLabel }}{% else %}{{ 'list.to'|trans({'%address%': latest ? latest.to|join(', ') : ''}, 'resend_inbox') }}{% endif %}
+                {% if message_count > 1 %}<span class="inbox-muted">({{ message_count }})</span>{% endif %}
+            </span>
+            <time class="inbox-row__time" datetime="{{ thread.lastMessageAt|date('c') }}">{{ thread.lastMessageAt|date('date_format'|trans({}, 'resend_inbox')) }}</time>
+        </span>
+        <span class="inbox-row__subject">{{ thread.subject ?: 'no_subject'|trans({}, 'resend_inbox') }}</span>
+        <span class="inbox-row__mailbox">{{ thread.mailbox }}</span>
+    </a>
+</li>
