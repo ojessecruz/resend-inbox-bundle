@@ -2,6 +2,10 @@
 
 All notable changes to `resend-inbox-bundle` will be documented in this file.
 
+## 0.1.2 - 2026-10-09
+
+- "Mark as unread" for the ticked conversations in the list.
+
 ## 0.1.1 - 2026-10-09
 
 - "Mark as read" for the ticked conversations in the list.

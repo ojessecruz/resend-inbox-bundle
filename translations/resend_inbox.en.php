@@ -39,6 +39,7 @@ return [
     ],
     'notices' => [
         'marked_read' => '%count% conversation marked as read.|%count% conversations marked as read.',
+        'marked_unread' => '%count% conversation marked as unread.|%count% conversations marked as unread.',
         'archived' => '%count% conversation archived.|%count% conversations archived.',
         'unarchived' => '%count% conversation moved to the inbox.|%count% conversations moved to the inbox.',
         'reply_sent' => 'Reply sent.',

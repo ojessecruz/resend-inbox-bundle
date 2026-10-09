@@ -152,7 +152,7 @@ final class InboxController extends AbstractController
     }
 
     /**
-     * Mark as read, archive or unarchive the ticked conversations of the list.
+     * Mark as read or unread, archive or unarchive the ticked conversations of the list.
      */
     public function bulk(Request $request): Response
     {
@@ -169,6 +169,7 @@ final class InboxController extends AbstractController
         }
         $notice = match ($action) {
             'mark_read' => 'notices.marked_read',
+            'mark_unread' => 'notices.marked_unread',
             'archive' => 'notices.archived',
             'unarchive' => 'notices.unarchived',
             default => null,
@@ -179,6 +180,7 @@ final class InboxController extends AbstractController
             foreach ($this->threads->findBy(['id' => $ids]) as $thread) {
                 match ($action) {
                     'mark_read' => $thread->markRead(),
+                    'mark_unread' => $thread->markUnread(),
                     'archive' => $thread->archive(),
                     default => $thread->unarchive(),
                 };

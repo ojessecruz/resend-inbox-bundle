@@ -39,6 +39,7 @@ return [
     ],
     'notices' => [
         'marked_read' => '%count% conversa marcada como lida.|%count% conversas marcadas como lidas.',
+        'marked_unread' => '%count% conversa marcada como não lida.|%count% conversas marcadas como não lidas.',
         'archived' => '%count% conversa arquivada.|%count% conversas arquivadas.',
         'unarchived' => '%count% conversa movida para a caixa de entrada.|%count% conversas movidas para a caixa de entrada.',
         'reply_sent' => 'Resposta enviada.',

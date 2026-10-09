@@ -187,6 +187,27 @@ it('marks the ticked conversations as read in bulk', function () {
     expect($this->client->getCrawler()->filter('.inbox-notice')->text())->toBe('2 conversations marked as read.');
 });
 
+it('marks the ticked conversations as unread in bulk', function () {
+    $first = storedEmail(['subject' => 'One']);
+    $second = storedEmail(['subject' => 'Two', 'fromAddress' => 'other@customer.test']);
+
+    foreach ([$first, $second] as $message) {
+        threadOf($message)->markRead();
+        $this->entityManager()->flush();
+    }
+
+    $crawler = $this->actingAsAdmin()->request('GET', '/inbox/');
+    $form = $crawler->selectButton('Mark as unread')->form();
+    $form['ids'][0]->tick();
+    $this->client->submit($form);
+
+    $unread = array_filter([threadOf($first), threadOf($second)], fn ($thread) => $thread->isUnread());
+    expect($unread)->toHaveCount(1);
+
+    $this->client->followRedirect();
+    expect($this->client->getCrawler()->filter('.inbox-notice')->text())->toBe('1 conversation marked as unread.');
+});
+
 it('archives the ticked conversations in bulk', function () {
     $first = storedEmail(['subject' => 'One']);
     $second = storedEmail(['subject' => 'Two', 'fromAddress' => 'other@customer.test']);
