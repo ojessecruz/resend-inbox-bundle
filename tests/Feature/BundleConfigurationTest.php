@@ -35,5 +35,12 @@ it('maps the configuration to parameters', function () {
 
     expect($container->getParameter('resend_inbox.access_role'))->toBe('ROLE_SUPPORT')
         ->and($container->getParameter('resend_inbox.resend.webhook_secret'))->toBe('')
-        ->and($container->getParameter('resend_inbox.per_page'))->toBe(25);
+        ->and($container->getParameter('resend_inbox.per_page'))->toBe(25)
+        ->and($container->getParameter('resend_inbox.theme'))->toBe('system');
 });
+
+it('accepts only the known themes', function () {
+    expect(loadInboxConfig(['sender_name' => 'Acme', 'access_role' => 'ROLE_ADMIN', 'theme' => 'app', 'resend' => ['api_key' => 're_x']])->getParameter('resend_inbox.theme'))->toBe('app');
+
+    loadInboxConfig(['sender_name' => 'Acme', 'access_role' => 'ROLE_ADMIN', 'theme' => 'blue', 'resend' => ['api_key' => 're_x']]);
+})->throws(InvalidConfigurationException::class, 'theme');

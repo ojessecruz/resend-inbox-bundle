@@ -256,3 +256,14 @@ it('exposes the unread count to Twig for the app menu', function () {
 
     expect($twig->createTemplate('{{ resend_inbox_unread_count() }}')->render())->toBe('2');
 });
+
+it('marks every screen with the configured theme for the stylesheet', function () {
+    $message = storedEmail();
+
+    foreach (['/inbox/', '/inbox/compose', '/inbox/'.$message->getThread()->getId()] as $url) {
+        $crawler = $this->actingAsAdmin()->request('GET', $url);
+
+        expect($crawler->filter('body.inbox-page')->attr('data-inbox-theme'))->toBe('system')
+            ->and($crawler->filter('.inbox')->attr('data-inbox-theme'))->toBe('system');
+    }
+});

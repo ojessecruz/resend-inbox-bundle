@@ -16,7 +16,8 @@
                     body.style.background = getComputedStyle(frame).backgroundColor;
                 }
 
-                const height = frame.contentDocument?.documentElement?.scrollHeight;
+                // The document's scrollHeight is never below the iframe's own height, so measure the content.
+                const height = body ? Math.max(body.scrollHeight, frame.contentDocument.documentElement.offsetHeight) : 0;
 
                 if (height) {
                     frame.style.height = `${height}px`;

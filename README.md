@@ -51,6 +51,7 @@ resend_inbox:
 | `signatures` | Markdown signature per address: `{ 'support@example.com': "Jane\nAcme Support" }`. |
 | `access_role` | Role allowed to open the inbox. Required. |
 | `per_page` | Conversations per page (25). |
+| `theme` | Light or dark screens. `system` (default) follows the operating system; `app` follows your app's theme toggle: dark under a `dark` class, `data-theme="dark"` or `data-bs-theme="dark"` on an ancestor such as `<html>`, light otherwise; `light` and `dark` are fixed. |
 | `resend.api_key` | A Resend API key with full access: it sends email and reads received emails. |
 | `resend.webhook_secret` | The signing secret (`whsec_…`) of the webhook below. While it is empty, the webhook route answers 503. |
 
@@ -166,7 +167,7 @@ The look comes from `inbox.css`, driven by CSS variables. Override them to match
 
 The email body takes `--inbox-email-text` and `--inbox-email-bg` (dark text on white by default, also in dark mode, since most HTML emails are designed for a light background).
 
-It follows the system's dark mode. `inbox.js` only adds conveniences (select all, autosizing the email iframe, applying the status filter on change); every screen works without it.
+It follows the `theme` option (the system's dark mode by default). `inbox.js` only adds conveniences (select all, autosizing the email iframe, applying the status filter on change); every screen works without it.
 
 ## Customizing the screens
 

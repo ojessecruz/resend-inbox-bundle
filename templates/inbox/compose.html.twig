@@ -3,7 +3,7 @@
 {% block resend_inbox_title %}{{ 'titles.compose'|trans({}, 'resend_inbox') }}{% endblock %}
 
 {% block resend_inbox_content %}
-<div class="inbox inbox--compose">
+<div class="inbox inbox--compose" data-inbox-theme="{{ resend_inbox_theme }}">
     <a class="inbox-back" href="{{ path('resend_inbox_index') }}">&larr; {{ 'titles.inbox'|trans({}, 'resend_inbox') }}</a>
 
     {{ include('@ResendInbox/partials/_heading.html.twig', {title: 'titles.compose'|trans({}, 'resend_inbox')}) }}

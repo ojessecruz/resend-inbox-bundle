@@ -50,6 +50,11 @@ final class ResendInboxBundle extends AbstractBundle
                     ->min(1)
                     ->defaultValue(25)
                 ->end()
+                ->enumNode('theme')
+                    ->info('Light or dark screens: "system" follows the operating system, "app" follows a dark class or data-theme / data-bs-theme="dark" set by your app on an ancestor, "light" and "dark" are fixed.')
+                    ->values(['system', 'app', 'light', 'dark'])
+                    ->defaultValue('system')
+                ->end()
                 ->arrayNode('resend')
                     ->isRequired()
                     ->children()
@@ -67,7 +72,7 @@ final class ResendInboxBundle extends AbstractBundle
     }
 
     /**
-     * @param  array{domain: ?string, mailboxes: list<string>, sender_name: string, signatures: array<string, string>, access_role: string, per_page: int, resend: array{api_key: string, webhook_secret: string}}  $config
+     * @param  array{domain: ?string, mailboxes: list<string>, sender_name: string, signatures: array<string, string>, access_role: string, per_page: int, theme: string, resend: array{api_key: string, webhook_secret: string}}  $config
      */
     public function loadExtension(array $config, ContainerConfigurator $container, ContainerBuilder $builder): void
     {
@@ -78,6 +83,7 @@ final class ResendInboxBundle extends AbstractBundle
             ->set('resend_inbox.signatures', $config['signatures'])
             ->set('resend_inbox.access_role', $config['access_role'])
             ->set('resend_inbox.per_page', $config['per_page'])
+            ->set('resend_inbox.theme', $config['theme'])
             ->set('resend_inbox.resend.api_key', $config['resend']['api_key'])
             ->set('resend_inbox.resend.webhook_secret', $config['resend']['webhook_secret']);
 

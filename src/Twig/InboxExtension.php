@@ -5,13 +5,26 @@ declare(strict_types=1);
 namespace Jessecruz\ResendInboxBundle\Twig;
 
 use Jessecruz\ResendInboxBundle\Repository\InboxThreadRepository;
+use Jessecruz\ResendInboxBundle\Settings\InboxSettings;
 use Twig\Extension\AbstractExtension;
+use Twig\Extension\GlobalsInterface;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
 
-final class InboxExtension extends AbstractExtension
+final class InboxExtension extends AbstractExtension implements GlobalsInterface
 {
-    public function __construct(private readonly InboxThreadRepository $threads) {}
+    public function __construct(
+        private readonly InboxThreadRepository $threads,
+        private readonly InboxSettings $settings,
+    ) {}
+
+    /**
+     * @return array{resend_inbox_theme: string}
+     */
+    public function getGlobals(): array
+    {
+        return ['resend_inbox_theme' => $this->settings->theme];
+    }
 
     public function getFunctions(): array
     {

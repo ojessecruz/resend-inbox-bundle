@@ -1,7 +1,7 @@
 {% extends '@ResendInbox/layout.html.twig' %}
 
 {% block resend_inbox_content %}
-<div class="inbox">
+<div class="inbox" data-inbox-theme="{{ resend_inbox_theme }}">
     {% embed '@ResendInbox/partials/_heading.html.twig' with {title: 'titles.inbox'|trans({}, 'resend_inbox')} %}
         {% block actions %}
             <a class="inbox-button inbox-button--primary" href="{{ path('resend_inbox_compose') }}">{{ 'actions.compose'|trans({}, 'resend_inbox') }}</a>

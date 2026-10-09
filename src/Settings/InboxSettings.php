@@ -30,6 +30,7 @@ final readonly class InboxSettings
         public string $senderName,
         array $signatures = [],
         public int $perPage = 25,
+        public string $theme = 'system',
     ) {
         $this->mailboxes = array_values(array_unique(array_filter(array_map(EmailAddress::address(...), $mailboxes))));
 

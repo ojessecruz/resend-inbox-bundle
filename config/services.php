@@ -39,6 +39,7 @@ return static function (ContainerConfigurator $container): void {
             param('resend_inbox.sender_name'),
             param('resend_inbox.signatures'),
             param('resend_inbox.per_page'),
+            param('resend_inbox.theme'),
         ]);
 
     $services->set('resend_inbox.resend_client', Client::class)

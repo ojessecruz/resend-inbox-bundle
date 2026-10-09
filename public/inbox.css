@@ -25,9 +25,28 @@
     --inbox-email-bg: #ffffff;
 }
 
+/* Dark: theme "dark", theme "app" under a dark class or data-theme / data-bs-theme set by the app, theme "system" on a dark OS. */
+:is(.inbox, .inbox-page)[data-inbox-theme="dark"],
+:is(.dark, [data-theme="dark"], [data-bs-theme="dark"]) :is(.inbox, .inbox-page)[data-inbox-theme="app"] {
+    --inbox-text: #f4f4f5;
+    --inbox-muted: #a1a1aa;
+    --inbox-bg: #09090b;
+    --inbox-surface: #18181b;
+    --inbox-border: #27272a;
+    --inbox-accent: #f4f4f5;
+    --inbox-accent-text: #09090b;
+    --inbox-outbound: #172554;
+    --inbox-outbound-border: #1e3a8a;
+    --inbox-info: #1e3a8a;
+    --inbox-info-text: #dbeafe;
+    --inbox-success: #14532d;
+    --inbox-success-text: #dcfce7;
+    --inbox-danger: #7f1d1d;
+    --inbox-danger-text: #fee2e2;
+}
+
 @media (prefers-color-scheme: dark) {
-    .inbox,
-    .inbox-page {
+    :is(.inbox, .inbox-page)[data-inbox-theme="system"] {
         --inbox-text: #f4f4f5;
         --inbox-muted: #a1a1aa;
         --inbox-bg: #09090b;

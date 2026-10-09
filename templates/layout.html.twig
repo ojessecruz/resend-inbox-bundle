@@ -15,7 +15,7 @@
     <title>{% block resend_inbox_title %}{{ 'titles.inbox'|trans({}, 'resend_inbox') }}{% endblock %}</title>
     {{ include('@ResendInbox/_assets.html.twig') }}
 </head>
-<body class="inbox-page">
+<body class="inbox-page" data-inbox-theme="{{ resend_inbox_theme }}">
     {% block resend_inbox_content %}{% endblock %}
 </body>
 </html>
